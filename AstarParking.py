@@ -19,10 +19,15 @@ class State:
         self.heuristic_cost = 0
         self.total_cost = 0
 
-    #greater than method
+    # greater than method
     def __gt__(self, other):
 
         return self.total_cost > other.total_cost
+
+    #  == operator
+    def __eq__(self, other):
+
+        return self.matrix_form == other.matrix_form
 
     def free_to_move_left(self, position_matrix):
 
@@ -52,7 +57,38 @@ class State:
         return True
 
     def get_possible_moves(self):
-        pass
+
+        possible_states=[]
+
+        for key in self.map_form:
+
+            if self.free_to_move_right() or self.free_to_move_left():
+
+                for line_vec in range self.matrix_form:
+
+                    for car in line_vec:
+
+                        if car == "__":
+                            
+
+
+
+
+        #saman rivin paikan vaihdokset
+
+        nimi="a"
+        paikka=[2,1]
+
+        #vasempaan
+        x=paikka[0]-1
+        #mahdolliset paikat vasempaan
+
+        for i in range(x,0,-1):
+            if self.matrix_form[paikka[1]][i]="__":
+                #create new state
+            else:
+                break
+
 
 
 
@@ -71,6 +107,9 @@ class Astar:
         #self.__cells=[]
         self.__start_state=start_state
         self.__goal_state=goal_state
+
+
+
 
 
 
@@ -122,19 +161,16 @@ def main():
     start_state, size =read_file(start_file)
     goal_state, size  =read_file(goal_file)
 
-    Astar.size=size
+    State.size=size
 
     astar=Astar(start_state, goal_state)
 
-    astar.run_Astar()
+    result= astar.run_Astar()
+
+    wrire_files(result)
 
     #price= astar.heuristic(start_map)
     #print(price)
-
-    current_cost=[]
-    current_route=[]
-    next_steps=[]
-
 
 
 
@@ -167,6 +203,10 @@ def read_file(filename):
     print(hasmap)
 
     return State(matrix, hasmap), first_row
+
+
+def wrire_files(result):
+    pass
 
 if __name__=="__main__":
     main()
