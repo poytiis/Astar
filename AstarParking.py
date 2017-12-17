@@ -1,6 +1,7 @@
 import sys
 import time
 import heapq
+import copy
 
 class State:
 
@@ -29,28 +30,41 @@ class State:
 
         return self.matrix_form == other.matrix_form
 
-    def free_to_move_left(self, position_matrix):
+    def __str__(self):
+        return str(self.matrix_form)
 
-        x=position_matrix[0]-1
+    def free_to_move_left(self, name):
+    #    print(name,"   nimi")
+    #    print(self.map_form)
+    #    print(self.matrix_form)
 
-        if x<0:
+        position_matrix=self.map_form[name]
+        x=position_matrix[0]
+
+    #    print("x ",x,"y  ", position_matrix[1])
+        if x==0:
             return True
 
         for i in range(0,x):
+            #print([self.matrix_form[ i ][position_matrix[1]], i , position_matrix[1]])
             if self.matrix_form[ position_matrix[1] ][i] != "__":
                 return False
 
         return True
 
-    def free_to_move_right(self, position_matrix):
+    def free_to_move_right(self, name):
+
+        position_matrix=self.map_form[name]
 
         x = position_matrix[0]+1
 
-        size=self.matrix_form[0].size()-1
+        size= State.size[0]
 
+        #print([size,x])
         if x>size:
             return True
         for i in range(x, size):
+            #print("silmukassa")
             if self.matrix_form[ position_matrix[1] ][i] != "__":
                 return False
 
@@ -58,39 +72,76 @@ class State:
 
     def get_possible_moves(self):
 
+        print(self.free_to_move_right("C1"), "oikea")
+        print(self.free_to_move_left("C1"), "vasen")
         possible_states=[]
+        #set_state=set()
+        moves=0
+        empty_lane=False
 
         for key in self.map_form:
 
-            if self.free_to_move_right() or self.free_to_move_left():
+            if any([self.free_to_move_right(key), self.free_to_move_left(key)]):
+                print("vapaa liikkuun ",key)
 
-                for line_vec in range self.matrix_form:
+                for line in range( State.size[1])  :
 
-                    for car in line_vec:
-
-                        if car == "__":
-                            
+                    for column in  range( State.size[0] ):
 
 
+                        if self.matrix_form[line][column] == "__":
+                            moves+=1
+                            print("key", key, "line", line, "colums", column)
+                            possible_states.append(self.create_state(key,[column, line] ))
+
+                            if column==State.size[0]-1:
+                                empty_lane=True
+                            #set_state.add(self.create_state(key,[column, line] ))
+                        else:
+                            break
+
+                    if empty_lane==True:
+                        print("tyhjärivi")
+                        empty_lane=False
+                        continue
 
 
-        #saman rivin paikan vaihdokset
+                    for column2 in range(State.size[0]-1, -1, -1):
 
-        nimi="a"
-        paikka=[2,1]
+                        if self.matrix_form[line][column2] == "__":
+                            moves+=1
+                            print("key", key, "line", line, "colums", column2)
+                            possible_states.append(self.create_state(key,[column2, line] ))
+                            #set_state.add(self.create_state(key,[column, line] ))
+                        else:
+                            break
 
-        #vasempaan
-        x=paikka[0]-1
-        #mahdolliset paikat vasempaan
 
-        for i in range(x,0,-1):
-            if self.matrix_form[paikka[1]][i]="__":
-                #create new state
             else:
-                break
+                print("ei päästy", key)
+
+        print("loops", moves)
+        print(len(possible_states),"tilat")
+
+        return possible_states
 
 
 
+    def create_state(self, name, new_location):
+
+        new_map=copy.deepcopy(self.map_form)
+        new_matrix=copy.deepcopy(self.matrix_form)
+
+        current_location=list(self.map_form[name])
+        #new_matrix=list(self.matrix_form)
+        new_matrix[current_location[1]][current_location[0]]="__"
+        new_matrix[new_location[1]][new_location[0]]=name
+
+
+        #new_map=dict(self.map_form)
+        new_map[name]=new_location
+
+        return State(new_matrix, new_map)
 
 
 
@@ -109,8 +160,32 @@ class Astar:
         self.__goal_state=goal_state
 
 
+    def run_Astar(self):
+        '''
+        print(self.__start_state.free_to_move_left("A2"))
+        print(self.__start_state.free_to_move_left("A1"))
+        print(self.__start_state.free_to_move_left("C1"))
+        print(self.__start_state.free_to_move_left("C2"))
+        print(self.__start_state.free_to_move_left("B1"))
+        print(self.__start_state.free_to_move_left("B2"))
+
+        print(self.__start_state.free_to_move_right("A1"))
+        print(self.__start_state.free_to_move_right("A1"))
+        print(self.__start_state.free_to_move_right("B2"))
+        print(self.__start_state.free_to_move_right("B1"))
+        print(self.__start_state.free_to_move_right("C1"))
+        print(self.__start_state.free_to_move_right("C2"))
+
+        '''
 
 
+        #print(self.__start_state.free_to_move_right("C1"))
+        #print(self.__start_state.free_to_move_left("C1"))
+
+        a=self.__start_state.get_possible_moves()
+
+        for i in a:
+            print(i)
 
 
 
@@ -143,11 +218,9 @@ class Astar:
         return heuristic_cost
 
 
-    def run_Astar(self):
-        pass
 
-    def __get_legal_moves(self):
-        pass
+
+
 
 
 
@@ -167,7 +240,7 @@ def main():
 
     result= astar.run_Astar()
 
-    wrire_files(result)
+    write_files(result)
 
     #price= astar.heuristic(start_map)
     #print(price)
@@ -188,7 +261,7 @@ def read_file(filename):
     first_row=first_row.split()
     first_row= [int(s) for s in first_row]
 
-    print(first_row)
+    #print(first_row)
     lines.pop(0)
 
     for i in range(len(lines)):
@@ -200,12 +273,14 @@ def read_file(filename):
         for e in range(len(line_vec)):
             hasmap[line_vec[e]]=[e,i]
 
-    print(hasmap)
+
+    hasmap.pop("__", None)
+    #print(hasmap)
 
     return State(matrix, hasmap), first_row
 
 
-def wrire_files(result):
+def write_files(result):
     pass
 
 if __name__=="__main__":
