@@ -72,8 +72,8 @@ class State:
 
     def get_possible_moves(self):
 
-        print(self.free_to_move_right("C1"), "oikea")
-        print(self.free_to_move_left("C1"), "vasen")
+    #    print(self.free_to_move_right("C1"), "oikea")
+    #    print(self.free_to_move_left("C1"), "vasen")
         possible_states=[]
         #set_state=set()
         moves=0
@@ -91,7 +91,7 @@ class State:
 
                         if self.matrix_form[line][column] == "__":
                             moves+=1
-                            print("key", key, "line", line, "colums", column)
+                        #    print("key", key, "line", line, "colums", column)
                             possible_states.append(self.create_state(key,[column, line] ))
 
                             if column==State.size[0]-1:
@@ -110,7 +110,7 @@ class State:
 
                         if self.matrix_form[line][column2] == "__":
                             moves+=1
-                            print("key", key, "line", line, "colums", column2)
+                        #    print("key", key, "line", line, "colums", column2)
                             possible_states.append(self.create_state(key,[column2, line] ))
                             #set_state.add(self.create_state(key,[column, line] ))
                         else:
@@ -118,7 +118,37 @@ class State:
 
 
             else:
-                print("ei päästy", key)
+
+                pos= self.map_form[key]
+
+                for column in  range( pos[0]-1,0,-1 ):
+
+
+                    if self.matrix_form[pos[1]][column] == "__":
+                        moves+=1
+                        print("key", key, "line", line, "colums", column)
+                        possible_states.append(self.create_state(key,[column, pos[1]] ))
+
+                    else:
+                        break
+
+                for column in  range( pos[0]+1, State.size[0] ):
+
+
+                    if self.matrix_form[pos[1]][column] == "__":
+                        moves+=1
+                        print("key", key, "line", line, "colums", column)
+                        possible_states.append(self.create_state(key,[column, pos[1]] ))
+
+                        
+                    else:
+                        break
+
+
+
+
+
+
 
         print("loops", moves)
         print(len(possible_states),"tilat")
@@ -187,6 +217,8 @@ class Astar:
         for i in a:
             print(i)
 
+        print(State.size)
+
 
 
     def __get_path(self):
@@ -234,6 +266,7 @@ def main():
     start_state, size =read_file(start_file)
     goal_state, size  =read_file(goal_file)
 
+    print(size, "main")
     State.size=size
 
     astar=Astar(start_state, goal_state)
