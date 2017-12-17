@@ -33,6 +33,11 @@ class State:
     def __str__(self):
         return str(self.matrix_form)
 
+
+
+
+
+
     def free_to_move_left(self, name):
     #    print(name,"   nimi")
     #    print(self.map_form)
@@ -75,7 +80,8 @@ class State:
     #    print(self.free_to_move_right("C1"), "oikea")
     #    print(self.free_to_move_left("C1"), "vasen")
         possible_states=[]
-        #set_state=set()
+        possible_prices=[]
+
         moves=0
         empty_lane=False
 
@@ -93,6 +99,7 @@ class State:
                             moves+=1
                         #    print("key", key, "line", line, "colums", column)
                             possible_states.append(self.create_state(key,[column, line] ))
+                            possible_prices.append(3)
 
                             if column==State.size[0]-1:
                                 empty_lane=True
@@ -112,6 +119,7 @@ class State:
                             moves+=1
                         #    print("key", key, "line", line, "colums", column2)
                             possible_states.append(self.create_state(key,[column2, line] ))
+                            possible_prices.append(4)
                             #set_state.add(self.create_state(key,[column, line] ))
                         else:
                             break
@@ -128,6 +136,7 @@ class State:
                         moves+=1
                         print("key", key, "line", line, "colums", column)
                         possible_states.append(self.create_state(key,[column, pos[1]] ))
+                        possible_prices.append(2)
 
                     else:
                         break
@@ -139,8 +148,9 @@ class State:
                         moves+=1
                         print("key", key, "line", line, "colums", column)
                         possible_states.append(self.create_state(key,[column, pos[1]] ))
+                        possible_prices.append(1)
 
-                        
+
                     else:
                         break
 
@@ -153,7 +163,7 @@ class State:
         print("loops", moves)
         print(len(possible_states),"tilat")
 
-        return possible_states
+        return possible_states, possible_prices
 
 
 
@@ -182,10 +192,6 @@ class Astar:
     def __init__(self, start_state, goal_state):
 
 
-        self.__openlist=[]
-        heapq.heapify(self.__openlist)
-        self.__closed=[]
-        #self.__cells=[]
         self.__start_state=start_state
         self.__goal_state=goal_state
 
@@ -208,9 +214,40 @@ class Astar:
 
         '''
 
+        openlist=[]
+        closedlist=[]
 
-        #print(self.__start_state.free_to_move_right("C1"))
-        #print(self.__start_state.free_to_move_left("C1"))
+        start=self.__start_state
+        openlist.append(start)
+
+        while openlist:
+            kasiteltava= min(openlist)
+
+            if kasiteltava == self.__goal_state:
+                self.__get_path(kasiteltava)
+
+
+            openlist.remove(kasiteltava)
+            closedlist.append(kasiteltava)
+
+            naapurit, siirto_hinnat =kasiteltava.get_possible_moves()
+
+            for tilat in naapurit:
+
+                if tilat not in closedlist:
+
+                    if tilat in openlist:
+                        if tilat.current_cost> kasiteltava.current_cost + siirto_hinnat[naapurit.index(tilat)]:
+                            self.update_state(tilat,kasiteltava ,siirto_hinnat[naapurit.index(tilat)])
+
+                    else:
+                        self.update_state( tilat,kasiteltava,siirto_hinnat[naapurit.index(tilat)] )
+                        openlist.append(tilat)
+
+
+
+
+
 
         a=self.__start_state.get_possible_moves()
 
@@ -221,8 +258,27 @@ class Astar:
 
 
 
-    def __get_path(self):
-        pass
+
+
+    def update_state(self, adj, current, price ):
+
+        adj.current_cost=current.current_cost+price
+        adj.parent=current
+        adj.heuristic_cost=self.heuristic(adj)
+        adj.total_cost=adj.current_cost+adj.heuristic_cost
+
+
+    def __get_path(self, goal):
+
+        print(goal)
+        previous=goal
+        while previous.parent != self.__start_state:
+
+            previous=previous.parent
+            print(previous)
+
+        print(self.__start_state)
+        sys.exit(0)
 
 
 
@@ -230,10 +286,11 @@ class Astar:
     def heuristic(self, current_state):
 
         heuristic_cost=0
+        current_state=current_state.map_form
 
         for key in current_state:
             car_pos=current_state[key]
-            car_goal=self.__final_map[key]
+            car_goal=self.__goal_state.map_form[key]
             x_change=car_pos[0]-car_goal[0]
             y_change=car_pos[1]-car_goal[1]
 
