@@ -15,6 +15,7 @@ class State:
 
 
         self.parent = None
+        self.state_move=[]
 
         self.current_cost = 0
         self.heuristic_cost = 0
@@ -81,6 +82,7 @@ class State:
     #    print(self.free_to_move_left("C1"), "vasen")
         possible_states=[]
         possible_prices=[]
+        possible_car_move=[]
 
         moves=0
         empty_lane=False
@@ -99,6 +101,7 @@ class State:
                             moves+=1
                         #    print("key", key, "line", line, "colums", column)
                             possible_states.append(self.create_state(key,[column, line] ))
+                            possible_car_move.append(key)
                             if line != self.map_form[key][1]:
                                 possible_prices.append(3)
 
@@ -125,6 +128,8 @@ class State:
                             moves+=1
 
                             possible_states.append(self.create_state(key,[column2, line] ))
+                            possible_car_move.append(key)
+
                             if line != self.map_form[key][1]:
                                 possible_prices.append(4)
 
@@ -148,6 +153,7 @@ class State:
                         moves+=1
                     #    print("key", key, "line", line, "colums", column)
                         possible_states.append(self.create_state(key,[column, pos[1]] ))
+                        possible_car_move.append(key)
                         possible_prices.append(2)
 
                     else:
@@ -160,6 +166,7 @@ class State:
                         moves+=1
                     #    print("key", key, "line", line, "colums", column)
                         possible_states.append(self.create_state(key,[column, pos[1]] ))
+                        possible_car_move.append(key)
                         possible_prices.append(1)
 
 
@@ -167,15 +174,7 @@ class State:
                         break
 
 
-
-
-
-
-
-
-        
-
-        return possible_states, possible_prices
+        return possible_states, possible_prices, possible_car_move
 
 
 
@@ -209,25 +208,12 @@ class Astar:
 
 
     def run_Astar(self):
-        '''
-        print(self.__start_state.free_to_move_left("A2"))
-        print(self.__start_state.free_to_move_left("A1"))
-        print(self.__start_state.free_to_move_left("C1"))
-        print(self.__start_state.free_to_move_left("C2"))
-        print(self.__start_state.free_to_move_left("B1"))
-        print(self.__start_state.free_to_move_left("B2"))
 
-        print(self.__start_state.free_to_move_right("A1"))
-        print(self.__start_state.free_to_move_right("A1"))
-        print(self.__start_state.free_to_move_right("B2"))
-        print(self.__start_state.free_to_move_right("B1"))
-        print(self.__start_state.free_to_move_right("C1"))
-        print(self.__start_state.free_to_move_right("C2"))
-
-        '''
 
         openlist=[]
         closedlist=[]
+
+        expansions=0
 
         start=self.__start_state
         openlist.append(start)
@@ -236,13 +222,15 @@ class Astar:
             process= min(openlist)
 
             if process == self.__goal_state:
-                self.__get_path(process)
+                self.__goal_state=process
+                return expansions
 
 
             openlist.remove(process)
             closedlist.append(process)
 
-            expanded, prices =process.get_possible_moves()
+            expanded, prices, cars =process.get_possible_moves()
+            expansions+= len(prices)
 
             for expanded_state in expanded:
 
@@ -250,47 +238,59 @@ class Astar:
 
                     if expanded_state in openlist:
                         if expanded_state.current_cost> process.current_cost + prices[expanded.index(expanded_state)]:
-                            self.update_state(expanded_state ,process ,prices[expanded.index(tilat)])
+                            self.update_state(expanded_state ,process ,prices[expanded.index(expanded_state)], cars[expanded.index(expanded_state)])
 
                     else:
-                        self.update_state( expanded_state ,process,prices[expanded.index(expanded_state)] )
+                        self.update_state( expanded_state ,process,prices[expanded.index(expanded_state)], cars[expanded.index(expanded_state)] )
                         openlist.append(expanded_state)
 
 
 
 
-
-
-        a=self.__start_state.get_possible_moves()
-
-        for i in a:
-            print(i)
-
-        print(State.size)
+        return False
 
 
 
 
-
-    def update_state(self, adj, current, price ):
+    def update_state(self, adj, current, price, car  ):
 
         adj.current_cost=current.current_cost+price
         adj.parent=current
         adj.heuristic_cost=self.heuristic(adj)
+        adj.state_move=[car, price]
         adj.total_cost=adj.current_cost+adj.heuristic_cost
 
 
-    def __get_path(self, goal):
+    def get_path(self, time, expansions):
 
-        print(goal)
-        previous=goal
-        while previous.parent != self.__start_state:
+        total_cost=0
+        total_length=0
+        plan_matrix=[]
 
+
+        print(self.__goal_state)
+        previous=self.__goal_state
+        while previous != self.__start_state:
+            location=previous.map_form[previous.state_move[0]]
+            previous_location=previous.parent.map_form[previous.state_move[0]]
+
+            line=','+str(previous.state_move[0])+',L'+str(previous_location[1])+' '+\
+            'P'+str(previous_location[0])+',L'+str(location[1])+' P'+str(location[0])+','+str(previous.state_move[1])
+
+            plan_matrix.append(line)
+            total_cost+=previous.state_move[1]
             previous=previous.parent
             print(previous)
+            total_length +=1
 
-        print(self.__start_state)
-        sys.exit(0)
+        #print(self.__start_state)
+        plan_matrix=list(reversed(plan_matrix))
+
+        for i in range(len(plan_matrix)):
+            plan_matrix[i]=str(i+1)+plan_matrix[i]
+        print(plan_matrix)
+        print("total cost ", total_cost, "total length", total_length)
+        return
 
 
 
@@ -337,14 +337,26 @@ def main():
     start_state, size =read_file(start_file)
     goal_state, size  =read_file(goal_file)
 
-    print(size, "main")
+
     State.size=size
 
     astar=Astar(start_state, goal_state)
 
-    result= astar.run_Astar()
+    expansion= astar.run_Astar()
 
-    write_files(result)
+    if expansion==False:
+        print("no solution found")
+        return
+    end_time=time.time()
+    consumed_time=end_time-start_time
+    time_2_decimal=format(consumed_time, '.2f')
+
+    astar.get_path(time_2_decimal, expansion)
+    print("time ",time_2_decimal,"expands", expansion)
+
+
+
+
 
     #price= astar.heuristic(start_map)
     #print(price)
