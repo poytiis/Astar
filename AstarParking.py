@@ -99,7 +99,13 @@ class State:
                             moves+=1
                         #    print("key", key, "line", line, "colums", column)
                             possible_states.append(self.create_state(key,[column, line] ))
-                            possible_prices.append(3)
+                            if line != self.map_form[key][1]:
+                                possible_prices.append(3)
+
+                            elif  line == self.map_form[key][1] and column==0:
+                                possible_prices.append(3)
+                            else:
+                                possible_prices.append(2)
 
                             if column==State.size[0]-1:
                                 empty_lane=True
@@ -117,10 +123,16 @@ class State:
 
                         if self.matrix_form[line][column2] == "__":
                             moves+=1
-                        #    print("key", key, "line", line, "colums", column2)
+
                             possible_states.append(self.create_state(key,[column2, line] ))
-                            possible_prices.append(4)
-                            #set_state.add(self.create_state(key,[column, line] ))
+                            if line != self.map_form[key][1]:
+                                possible_prices.append(4)
+
+                            elif  line == self.map_form[key][1] and column==0:
+                                possible_prices.append(4)
+                            else:
+                                possible_prices.append(1)
+
                         else:
                             break
 
@@ -294,15 +306,17 @@ class Astar:
             x_change=car_pos[0]-car_goal[0]
             y_change=car_pos[1]-car_goal[1]
 
-            if x_change < 0 :
-                heuristic_cost += 1
-            elif x_change >0:
-                heuristic_cost += 2
-            elif x_change ==0 and y_change !=0:
-                heuristic_cost += 1
 
             if y_change !=0:
-                heuristic_cost += 1
+                if self.__goal_state.free_to_move_right(key):
+                    heuristic_cost=+4
+                else:
+                    heuristic_cost+=3
+            else:
+                if x_change < 0 :
+                    heuristic_cost += 1
+                elif x_change >0:
+                    heuristic_cost += 2
 
         return heuristic_cost
 
