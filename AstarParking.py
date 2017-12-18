@@ -40,19 +40,17 @@ class State:
 
 
     def free_to_move_left(self, name):
-    #    print(name,"   nimi")
-    #    print(self.map_form)
-    #    print(self.matrix_form)
+
 
         position_matrix=self.map_form[name]
         x=position_matrix[0]
 
-    #    print("x ",x,"y  ", position_matrix[1])
+
         if x==0:
             return True
 
         for i in range(0,x):
-            #print([self.matrix_form[ i ][position_matrix[1]], i , position_matrix[1]])
+
             if self.matrix_form[ position_matrix[1] ][i] != "__":
                 return False
 
@@ -66,11 +64,11 @@ class State:
 
         size= State.size[0]
 
-        #print([size,x])
+
         if x>size:
             return True
         for i in range(x, size):
-            #print("silmukassa")
+
             if self.matrix_form[ position_matrix[1] ][i] != "__":
                 return False
 
@@ -78,8 +76,7 @@ class State:
 
     def get_possible_moves(self):
 
-    #    print(self.free_to_move_right("C1"), "oikea")
-    #    print(self.free_to_move_left("C1"), "vasen")
+
         possible_states=[]
         possible_prices=[]
         possible_car_move=[]
@@ -90,7 +87,7 @@ class State:
         for key in self.map_form:
 
             if any([self.free_to_move_right(key), self.free_to_move_left(key)]):
-                #print("vapaa liikkuun ",key)
+
 
                 for line in range( State.size[1])  :
 
@@ -99,7 +96,7 @@ class State:
 
                         if self.matrix_form[line][column] == "__":
                             moves+=1
-                        #    print("key", key, "line", line, "colums", column)
+
                             possible_states.append(self.create_state(key,[column, line] ))
                             possible_car_move.append(key)
                             if line != self.map_form[key][1]:
@@ -112,12 +109,12 @@ class State:
 
                             if column==State.size[0]-1:
                                 empty_lane=True
-                            #set_state.add(self.create_state(key,[column, line] ))
+
                         else:
                             break
 
                     if empty_lane==True:
-                        #print("tyhjärivi")
+
                         empty_lane=False
                         continue
 
@@ -151,7 +148,7 @@ class State:
 
                     if self.matrix_form[pos[1]][column] == "__":
                         moves+=1
-                    #    print("key", key, "line", line, "colums", column)
+
                         possible_states.append(self.create_state(key,[column, pos[1]] ))
                         possible_car_move.append(key)
                         possible_prices.append(2)
@@ -164,7 +161,7 @@ class State:
 
                     if self.matrix_form[pos[1]][column] == "__":
                         moves+=1
-                    #    print("key", key, "line", line, "colums", column)
+
                         possible_states.append(self.create_state(key,[column, pos[1]] ))
                         possible_car_move.append(key)
                         possible_prices.append(1)
@@ -184,12 +181,12 @@ class State:
         new_matrix=copy.deepcopy(self.matrix_form)
 
         current_location=list(self.map_form[name])
-        #new_matrix=list(self.matrix_form)
+
         new_matrix[current_location[1]][current_location[0]]="__"
         new_matrix[new_location[1]][new_location[0]]=name
 
 
-        #new_map=dict(self.map_form)
+
         new_map[name]=new_location
 
         return State(new_matrix, new_map)
@@ -283,7 +280,7 @@ class Astar:
             print(previous)
             total_length +=1
 
-        #print(self.__start_state)
+
         plan_matrix=list(reversed(plan_matrix))
 
         for i in range(len(plan_matrix)):
@@ -369,12 +366,6 @@ def main():
 
 
 
-    #price= astar.heuristic(start_map)
-    #print(price)
-
-
-
-
 def read_file(filename):
 
     file=open(filename, "r")
@@ -388,7 +379,7 @@ def read_file(filename):
     first_row=first_row.split()
     first_row= [int(s) for s in first_row]
 
-    #print(first_row)
+
     lines.pop(0)
 
     for i in range(len(lines)):
@@ -402,13 +393,11 @@ def read_file(filename):
 
 
     hasmap.pop("__", None)
-    #print(hasmap)
+
 
     return State(matrix, hasmap), first_row
 
 
-def write_files(result):
-    pass
 
 if __name__=="__main__":
     main()
