@@ -88,7 +88,7 @@ class State:
         for key in self.map_form:
 
             if any([self.free_to_move_right(key), self.free_to_move_left(key)]):
-                print("vapaa liikkuun ",key)
+                #print("vapaa liikkuun ",key)
 
                 for line in range( State.size[1])  :
 
@@ -114,7 +114,7 @@ class State:
                             break
 
                     if empty_lane==True:
-                        print("tyhjärivi")
+                        #print("tyhjärivi")
                         empty_lane=False
                         continue
 
@@ -146,7 +146,7 @@ class State:
 
                     if self.matrix_form[pos[1]][column] == "__":
                         moves+=1
-                        print("key", key, "line", line, "colums", column)
+                    #    print("key", key, "line", line, "colums", column)
                         possible_states.append(self.create_state(key,[column, pos[1]] ))
                         possible_prices.append(2)
 
@@ -158,7 +158,7 @@ class State:
 
                     if self.matrix_form[pos[1]][column] == "__":
                         moves+=1
-                        print("key", key, "line", line, "colums", column)
+                    #    print("key", key, "line", line, "colums", column)
                         possible_states.append(self.create_state(key,[column, pos[1]] ))
                         possible_prices.append(1)
 
@@ -172,8 +172,8 @@ class State:
 
 
 
-        print("loops", moves)
-        print(len(possible_states),"tilat")
+
+        
 
         return possible_states, possible_prices
 
@@ -233,28 +233,28 @@ class Astar:
         openlist.append(start)
 
         while openlist:
-            kasiteltava= min(openlist)
+            process= min(openlist)
 
-            if kasiteltava == self.__goal_state:
-                self.__get_path(kasiteltava)
+            if process == self.__goal_state:
+                self.__get_path(process)
 
 
-            openlist.remove(kasiteltava)
-            closedlist.append(kasiteltava)
+            openlist.remove(process)
+            closedlist.append(process)
 
-            naapurit, siirto_hinnat =kasiteltava.get_possible_moves()
+            expanded, prices =process.get_possible_moves()
 
-            for tilat in naapurit:
+            for expanded_state in expanded:
 
-                if tilat not in closedlist:
+                if expanded_state not in closedlist:
 
-                    if tilat in openlist:
-                        if tilat.current_cost> kasiteltava.current_cost + siirto_hinnat[naapurit.index(tilat)]:
-                            self.update_state(tilat,kasiteltava ,siirto_hinnat[naapurit.index(tilat)])
+                    if expanded_state in openlist:
+                        if expanded_state.current_cost> process.current_cost + prices[expanded.index(expanded_state)]:
+                            self.update_state(expanded_state ,process ,prices[expanded.index(tilat)])
 
                     else:
-                        self.update_state( tilat,kasiteltava,siirto_hinnat[naapurit.index(tilat)] )
-                        openlist.append(tilat)
+                        self.update_state( expanded_state ,process,prices[expanded.index(expanded_state)] )
+                        openlist.append(expanded_state)
 
 
 
