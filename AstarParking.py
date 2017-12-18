@@ -289,6 +289,17 @@ class Astar:
         for i in range(len(plan_matrix)):
             plan_matrix[i]=str(i+1)+plan_matrix[i]
         print(plan_matrix)
+        plan_file=open('extension.plan','w')
+        for item in plan_matrix:
+            plan_file.write("{}\n".format(item))
+
+        plan_file.close()
+        information_file=open('extension.info','w')
+        information_file.write('Step length: '+str(total_length)+'\n')
+        information_file.write('Running time (seconds): ' + str(time)+'\n')
+        information_file.write('Total cost: '+str( total_cost)+'\n')
+        information_file.write('Expansions: '+str( expansions)+'\n')
+        information_file.close()
         print("total cost ", total_cost, "total length", total_length)
         return
 
