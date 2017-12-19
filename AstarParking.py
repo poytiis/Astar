@@ -210,20 +210,22 @@ class Astar:
         openlist=[]
         closedlist=[]
 
+
         expansions=0
 
         start=self.__start_state
         openlist.append(start)
+        heapq.heapify(openlist)
 
         while openlist:
-            process= min(openlist)
+            process= heapq.heappop(openlist)
 
             if process == self.__goal_state:
                 self.__goal_state=process
                 return expansions
 
 
-            openlist.remove(process)
+
             closedlist.append(process)
 
             expanded, prices, cars =process.get_possible_moves()
@@ -239,7 +241,8 @@ class Astar:
 
                     else:
                         self.update_state( expanded_state ,process,prices[expanded.index(expanded_state)], cars[expanded.index(expanded_state)] )
-                        openlist.append(expanded_state)
+                        
+                        heapq.heappush(openlist,expanded_state)
 
 
 
