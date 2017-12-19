@@ -13,7 +13,7 @@ class State:
     #constuctor which creates public variables for class
     def __init__(self, matrix_form, map_form):
 
-        #state is stored as a vector and a map
+        #state is stored as a vector and a map. Empty spaces aren't appended into the map.
         self.matrix_form = matrix_form
         self.map_form = map_form
 
@@ -340,8 +340,8 @@ class Astar:
 
 
 
-    #heirstic function, calculates the distance assuming that you can move cars
-    # throw others and if the car in the goal state is not at the end of lane you
+    #heirstic function, calculates the heuristic cost assuming you can move cars
+    # throw others and if the car's position in the goal state is not the last one, you
     #can push it to its place with price 3
     #@param State object
     def heuristic(self, current_stat):
