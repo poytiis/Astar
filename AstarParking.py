@@ -119,7 +119,7 @@ class State:
                             if line != self.map_form[key][1]:
                                 possible_prices.append(3)
 
-                            elif  line == self.map_form[key][1] and column==0:
+                            elif  line == self.map_form[key][1] and not self.free_to_move_left(key):
                                 possible_prices.append(3)
                             else:
                                 possible_prices.append(2)
@@ -147,7 +147,7 @@ class State:
                             if line != self.map_form[key][1]:
                                 possible_prices.append(4)
 
-                            elif  line == self.map_form[key][1] and column==0:
+                            elif  line == self.map_form[key][1] and not self.free_to_move_right(key):
                                 possible_prices.append(4)
                             else:
                                 possible_prices.append(1)
