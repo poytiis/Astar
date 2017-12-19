@@ -1,15 +1,19 @@
+#Teemu Pöytäniemi, Niklas Nystad
 import sys
 import time
 import heapq
 import copy
 
+#class implemets one state and it has all functions which are needed to manipulate states
 class State:
 
     #static variable for size of matrix
     size=[]
 
+    #constuctor which creates public variables for class
     def __init__(self, matrix_form, map_form):
 
+        #state is stored as a vector and a map
         self.matrix_form = matrix_form
         self.map_form = map_form
 
@@ -21,21 +25,22 @@ class State:
         self.heuristic_cost = 0
         self.total_cost = 0
 
-    # greater than method
+    # greater than method, this method is needed to sort the openlist
     def __gt__(self, other):
 
         if self.total_cost != other.total_cost:
             return self.total_cost > other.total_cost
         else:
-            #return self.total_cost > other.total_cost
+
             return self.current_cost > other.current_cost
 
 
-    #  == operator
+    #  == operator, needed to compair the states
     def __eq__(self, other):
 
         return self.matrix_form == other.matrix_form
 
+    #only for printing the state
     def __str__(self):
         return str(self.matrix_form)
 
@@ -43,7 +48,9 @@ class State:
 
 
 
-
+    #checks if the is free to move left
+    #@param car's name, key to the map
+    #@return bool
     def free_to_move_left(self, name):
 
 
@@ -61,6 +68,9 @@ class State:
 
         return True
 
+    #checks if the car is free to move right
+    #@param car's name, key to the map
+    #@return bool
     def free_to_move_right(self, name):
 
         position_matrix=self.map_form[name]
@@ -79,6 +89,8 @@ class State:
 
         return True
 
+    #this method creates all possible states from current states
+    #@return list of all possible states, list of prices and list of moved cars
     def get_possible_moves(self):
 
 
@@ -179,9 +191,12 @@ class State:
         return possible_states, possible_prices, possible_car_move
 
 
-
+    #creates a new state from other
+    #@param name of moved car to create a new state, car's new location
+    #@return new State object
     def create_state(self, name, new_location):
 
+        #have to create deep copy from private cariables
         new_map=copy.deepcopy(self.map_form)
         new_matrix=copy.deepcopy(self.matrix_form)
 
@@ -200,8 +215,9 @@ class State:
 
 
 
-
+# This class implements A* algorit
 class Astar:
+    #constructor creates private variables start state and goal state
     def __init__(self, start_state, goal_state):
 
 
@@ -209,6 +225,8 @@ class Astar:
         self.__goal_state=goal_state
 
 
+    #A* algorit
+    #openlist is implemented as a heap, so sorting algorit is heap sort
     def run_Astar(self):
 
 
@@ -262,7 +280,9 @@ class Astar:
 
 
 
-
+    #update states costs
+    #@param adj is a neibhour state, current state, price to move between states, the car which has been moved
+    #@return void
     def update_state(self, adj, current, price, car  ):
 
         adj.current_cost=current.current_cost+price
@@ -272,6 +292,9 @@ class Astar:
         adj.total_cost=adj.current_cost+adj.heuristic_cost
 
 
+    #creates output files
+    #@param time consumed to calculate the task, expansions
+    #@return void but creates files extension.info and extension.plan if not excist allready
     def get_path(self, time, expansions):
 
         total_cost=0
@@ -317,6 +340,10 @@ class Astar:
 
 
 
+    #heirstic function, calculates the distance assuming that you can move cars
+    # throw others and if the car in the goal state is not at the end of lane you
+    #can push it to its place with price 3
+    #@param State object
     def heuristic(self, current_stat):
 
         heuristic_cost=0
@@ -350,7 +377,7 @@ class Astar:
 
 
 
-
+#main function which is called when the program starts
 def main():
     start_time=time.time()
 
@@ -380,7 +407,9 @@ def main():
 
 
 
-
+#reads the file
+#@param: file name
+#@return State object(first time called init state, last time goal state), first row as a list
 def read_file(filename):
 
     file=open(filename, "r")
