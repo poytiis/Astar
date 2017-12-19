@@ -246,8 +246,8 @@ class Astar:
 
 
             process= heapq.heappop(openlist)
-            print(kierrokset, "valittu tila ", process)
-            kierrokset+=1
+
+
 
             if process == self.__goal_state:
                 self.__goal_state=process
@@ -270,7 +270,7 @@ class Astar:
 
                     else:
                         self.update_state( expanded_state ,process,prices[expanded.index(expanded_state)], cars[expanded.index(expanded_state)] )
-                        #print(expanded_state.total_cost , expanded_state, "h ",expanded_state.heuristic_cost)
+
                         heapq.heappush(openlist,expanded_state)
 
 
