@@ -24,7 +24,12 @@ class State:
     # greater than method
     def __gt__(self, other):
 
-        return self.total_cost > other.total_cost
+        if self.total_cost != other.total_cost:
+            return self.total_cost > other.total_cost
+        else:
+            #return self.total_cost > other.total_cost
+            return self.current_cost > other.current_cost
+
 
     #  == operator
     def __eq__(self, other):
@@ -217,8 +222,14 @@ class Astar:
         openlist.append(start)
         heapq.heapify(openlist)
 
+        kierrokset=1
+
         while openlist:
+
+
             process= heapq.heappop(openlist)
+            print(kierrokset, "valittu tila ", process)
+            kierrokset+=1
 
             if process == self.__goal_state:
                 self.__goal_state=process
@@ -241,7 +252,7 @@ class Astar:
 
                     else:
                         self.update_state( expanded_state ,process,prices[expanded.index(expanded_state)], cars[expanded.index(expanded_state)] )
-                        
+                        #print(expanded_state.total_cost , expanded_state, "h ",expanded_state.heuristic_cost)
                         heapq.heappush(openlist,expanded_state)
 
 
@@ -306,10 +317,11 @@ class Astar:
 
 
 
-    def heuristic(self, current_state):
+    def heuristic(self, current_stat):
 
         heuristic_cost=0
-        current_state=current_state.map_form
+        current_state=current_stat.map_form
+
 
         for key in current_state:
             car_pos=current_state[key]
@@ -320,7 +332,7 @@ class Astar:
 
             if y_change !=0:
                 if self.__goal_state.free_to_move_right(key):
-                    heuristic_cost=+4
+                    heuristic_cost+=4
                 else:
                     heuristic_cost+=3
             else:
@@ -328,7 +340,7 @@ class Astar:
                     heuristic_cost += 1
                 elif x_change >0:
                     heuristic_cost += 2
-
+        #print( current_state," __  ",heuristic_cost)
         return heuristic_cost
 
 
