@@ -4,13 +4,13 @@ import time
 import heapq
 import copy
 
-#class implemets one state and it has all functions which are needed to manipulate states
+#class implemets one state and it has all the functions which are needed to manipulate states
 class State:
 
-    #static variable for size of matrix
+    #static variable for the size of matrix
     size=[]
 
-    #constuctor which creates public variables for class
+    #constuctor which creates public variables for the class
     def __init__(self, matrix_form, map_form):
 
         #state is stored as a vector and a map. Empty spaces aren't appended into the map.
@@ -40,7 +40,7 @@ class State:
 
         return self.matrix_form == other.matrix_form
 
-    #only for printing the state
+    #only for printing purpose
     def __str__(self):
         return str(self.matrix_form)
 
@@ -48,7 +48,7 @@ class State:
 
 
 
-    #checks if the is free to move left
+    #checks if the car is free to move left
     #@param car's name, key to the map
     #@return bool
     def free_to_move_left(self, name):
@@ -89,7 +89,7 @@ class State:
 
         return True
 
-    #this method creates all possible states from current states
+    #this method creates all possible states from current state
     #@return list of all possible states, list of prices and list of moved cars
     def get_possible_moves(self):
 
@@ -191,8 +191,8 @@ class State:
         return possible_states, possible_prices, possible_car_move
 
 
-    #creates a new state from other
-    #@param name of moved car to create a new state, car's new location
+    #creates a new state from the other
+    #@param the name of moved car to create a new state, car's new location
     #@return new State object
     def create_state(self, name, new_location):
 
